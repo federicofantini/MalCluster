@@ -1,0 +1,6 @@
+yara-python
+tqdm
+ssdeep
+py-tlsh
+jc-sdhash
+flask

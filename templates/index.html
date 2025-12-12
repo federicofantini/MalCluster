@@ -1,0 +1,180 @@
+<!--
+  Copyright (C) 2025 @federicofantini
+
+  This file is part of MalCluster.
+
+  MalCluster is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  MalCluster is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MalCluster</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 64px;
+            color: #58a6ff;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 0 10px #58a6ff;
+        }
+
+        .box {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            color: #58a6ff;
+        }
+
+        input[type=text],
+        input[type=number],
+        input[type=file] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 4px;
+        }
+
+        input[type=file] {
+            padding: 3px;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 10px 20px;
+            background-color: #238636;
+            color: #f0f6fc;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #2ea043;
+            transform: scale(1.05);
+        }
+
+        h2 {
+            color: #79c0ff;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .flash {
+            background-color: #30363d;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #58a6ff;
+            border-radius: 4px;
+            text-align: center;
+            color: #c9d1d9;
+        }
+
+        select.dark-select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+        }
+
+        select.dark-select:hover {
+            border-color: #58a6ff;
+            box-shadow: 0 0 8px rgba(88, 166, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>MalCluster</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <div class="flash">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data" class="box">
+
+        <h2>Upload malware files</h2>
+        <input type="file" name="files" multiple>
+
+        <h2>Configuration parameters</h2>
+
+        <label>Malcat directory</label>
+        <input type="text" name="malcat_dir" value="~/Malcat/bin">
+
+        <label>Output directory</label>
+        <input type="text" name="output_dir" value="./output">
+
+        <label>Longest Common Substring threshold</label>
+        <input type="number" name="lcs_threshold" value="8">
+
+        <label for="similarity_function">Fully normalize asm</label>
+        <select name="similarity_function" id="similarity_function" class="dark-select">
+            <option value="ssdeep" selected>Ssdeep</option>
+            <option value="tlsh">Tlsh</option>
+            <option value="sdhash">Sdhash</option>
+        </select>
+
+        <label>Similarity threshold</label>
+        <input type="number" name="similarity_threshold" value="25">
+
+        <label for="fully_normalize">Fully normalize asm</label>
+        <select name="fully_normalize" id="fully_normalize" class="dark-select">
+            <option value="True">True</option>
+            <option value="False" selected>False</option>
+        </select>
+
+        <button type="submit">Run pipeline</button>
+    </form>
+
+</body>
+</html>
