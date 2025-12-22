@@ -49,7 +49,7 @@
             border: 1px solid #30363d;
             padding: 30px;
             border-radius: 8px;
-            max-width: 500px;
+            max-width: 900px;
             width: 100%;
             box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
         }
@@ -57,62 +57,13 @@
         label {
             font-weight: bold;
             display: block;
-            margin-top: 15px;
+            margin-top: 5px;
             color: #58a6ff;
         }
 
         input[type=text],
         input[type=number],
-        input[type=file] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            border-radius: 4px;
-        }
-
-        input[type=file] {
-            padding: 3px;
-        }
-
-        button {
-            margin-top: 25px;
-            padding: 10px 20px;
-            background-color: #238636;
-            color: #f0f6fc;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        button:hover {
-            background-color: #2ea043;
-            transform: scale(1.05);
-        }
-
-        h2 {
-            color: #79c0ff;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-size: 20px;
-            text-align: center;
-        }
-
-        .flash {
-            background-color: #30363d;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #58a6ff;
-            border-radius: 4px;
-            text-align: center;
-            color: #c9d1d9;
-        }
-
+        input[type=file],
         select.dark-select {
             width: 100%;
             padding: 8px;
@@ -122,59 +73,104 @@
             color: #c9d1d9;
             border-radius: 4px;
             font-family: 'Courier New', Courier, monospace;
-            cursor: pointer;
         }
 
-        select.dark-select:hover {
-            border-color: #58a6ff;
-            box-shadow: 0 0 8px rgba(88, 166, 255, 0.3);
+        button {
+            margin-top: 30px;
+            padding: 12px 20px;
+            background-color: #238636;
+            color: #f0f6fc;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        h2 {
+            color: #79c0ff;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-top: 10px;
+        }
+
+        .param-grid .full {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body>
 
-    <h1>MalCluster</h1>
+<h1>MalCluster</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, msg in messages %}
-        <div class="flash">{{ msg }}</div>
-      {% endfor %}
-    {% endwith %}
+<form method="POST" enctype="multipart/form-data" class="box">
 
-    <form method="POST" enctype="multipart/form-data" class="box">
+    <h2>Upload malware files</h2>
+    <input type="file" name="files" multiple>
 
-        <h2>Upload malware files</h2>
-        <input type="file" name="files" multiple>
+    <h2>Configuration parameters</h2>
 
-        <h2>Configuration parameters</h2>
+    <label>Malcat directory</label>
+    <input type="text" name="malcat_dir" value="~/Malcat/bin">
 
-        <label>Malcat directory</label>
-        <input type="text" name="malcat_dir" value="~/Malcat/bin">
+    <label>Output directory</label>
+    <input type="text" name="output_dir" value="./output">
 
-        <label>Output directory</label>
-        <input type="text" name="output_dir" value="./output">
+    <div class="param-grid">
 
-        <label>Longest Common Substring threshold</label>
-        <input type="number" name="lcs_threshold" value="8">
+        <div>
+            <label>Longest Common Substring threshold</label>
+            <input type="number" name="lcs_threshold" value="8">
+        </div>
 
-        <label for="similarity_function">Fully normalize asm</label>
-        <select name="similarity_function" id="similarity_function" class="dark-select">
-            <option value="ssdeep" selected>Ssdeep</option>
-            <option value="tlsh">Tlsh</option>
-            <option value="sdhash">Sdhash</option>
-        </select>
+        <div>
+            <label>Similarity threshold</label>
+            <input type="number" name="similarity_threshold" value="25">
+        </div>
 
-        <label>Similarity threshold</label>
-        <input type="number" name="similarity_threshold" value="25">
+        <div>
+            <label for="similarity_function">Similarity function</label>
+            <select name="similarity_function" id="similarity_function" class="dark-select">
+                <option value="ssdeep" selected>Ssdeep</option>
+                <option value="tlsh">Tlsh</option>
+                <option value="sdhash">Sdhash</option>
+            </select>
+        </div>
 
-        <label for="fully_normalize">Fully normalize asm</label>
-        <select name="fully_normalize" id="fully_normalize" class="dark-select">
-            <option value="True">True</option>
-            <option value="False" selected>False</option>
-        </select>
+        <div>
+            <label for="fully_normalize">Fully normalize asm</label>
+            <select name="fully_normalize" id="fully_normalize" class="dark-select">
+                <option value="True">True</option>
+                <option value="False" selected>False</option>
+            </select>
+        </div>
 
-        <button type="submit">Run pipeline</button>
-    </form>
+        <div class="full">
+            <label for="dynamic_analysis">Enable dynamic analysis (just searching by sha256)</label>
+            <select name="dynamic_analysis" id="dynamic_analysis" class="dark-select">
+                <option value="True">True</option>
+                <option value="False" selected>False</option>
+            </select>
+        </div>
+
+    </div>
+
+    <label>CAPEv2 base url</label>
+    <input type="text" name="capev2_base_url" value="https://localhost">
+
+    <label>CAPEv2 api token</label>
+    <input type="text" name="capev2_api_token" value="">
+
+    <button type="submit">Run pipeline</button>
+</form>
 
 </body>
 </html>

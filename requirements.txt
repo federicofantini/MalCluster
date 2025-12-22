@@ -1,3 +1,4 @@
+requests
 yara-python
 tqdm
 ssdeep
