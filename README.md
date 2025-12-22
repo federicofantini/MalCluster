@@ -1,4 +1,4 @@
-# Malware
+# MalCluster
 
 **MalCluster** is a pipeline for extracting static and dynamic analysis artifacts from malware samples using the **Malcat** and **CAPEv2**, with a **Flask-based web GUI** for interactive usage.
 
