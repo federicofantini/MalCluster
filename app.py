@@ -23,6 +23,7 @@ __license__ = "GPLv3"
 
 
 import os
+from pathlib import Path
 from flask import Flask, render_template, request, flash
 from werkzeug.utils import secure_filename
 from malcluster import run_pipeline
@@ -33,6 +34,23 @@ app.secret_key = "change_me"
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+MALCAT_BASE_DIR = Path("malcat").resolve()
+OUTPUT_BASE_DIR = Path("outputs").resolve()
+MALCAT_BASE_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_BASE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_within_base(user_path: str, base_dir: Path) -> Path:
+    candidate = Path(user_path).expanduser()
+    if not candidate.is_absolute():
+        candidate = base_dir / candidate
+    resolved = candidate.resolve()
+    try:
+        resolved.relative_to(base_dir)
+    except ValueError:
+        raise ValueError(f"Path '{user_path}' is outside allowed directory '{base_dir}'.")
+    return resolved
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -41,6 +59,13 @@ def index():
         malcat_dir = request.form.get("malcat_dir")
         output_dir = request.form.get("output_dir")
         capev2_base_url = request.form.get("capev2_base_url")
+
+        try:
+            malcat_dir = str(_resolve_within_base(malcat_dir or "", MALCAT_BASE_DIR))
+            output_dir = str(_resolve_within_base(output_dir or "", OUTPUT_BASE_DIR))
+        except ValueError as e:
+            flash(f"Invalid path parameter: {e}", "danger")
+            return render_template("index.html")
         capev2_api_token = request.form.get("capev2_api_token")
         lcs_threshold = int(request.form.get("lcs_threshold", 8))
         similarity_function = request.form.get("similarity_function")
